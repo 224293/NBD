@@ -84,20 +84,12 @@ public class ComplaintController {
         try {
             List<Complaint> complaints = new ArrayList<Complaint>();
             if (boroughName == null) {
-                System.out.println("80");
                 complaintRepository.findAll().forEach(complaints::add);
-                System.out.println("82");
-            } else {
-                System.out.println("84");
-                //complaintRepository.findByBoroughName(boroughName).forEach(complaints::add);
-                System.out.println("86");
             }
             if (complaints.isEmpty()) {
-                System.out.println("89");
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
-            System.out.println("92");
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(complaints, HttpStatus.OK);
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
