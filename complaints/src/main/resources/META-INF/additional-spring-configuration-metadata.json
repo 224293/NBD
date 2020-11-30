@@ -1,0 +1,8 @@
+{
+  "properties": [
+    {
+      "name": "spring.data.cassandra.port.contact-points",
+      "type": "java.lang.String",
+      "description": "Description for spring.data.cassandra.port.contact-points."
+  }
+] }
