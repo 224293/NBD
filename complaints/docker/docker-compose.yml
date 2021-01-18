@@ -1,0 +1,68 @@
+version: "3"
+services:
+  seed:
+    image: cassandra:latest
+    ports:
+      - "9042:9042"
+    environment:
+      - "CASSANDRA_SEEDS=seed"
+      - "CASSANDRA_CLUSTER_NAME=cluster"
+      - "CASSANDRA_DC=se1"
+      - "CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch"
+    networks:
+      cluster_net:
+        ipv4_address: 192.19.0.3
+
+
+  node1:
+    image: cassandra:latest
+    command: /bin/bash -c "echo 'Waiting for seed node' && sleep 30 && /docker-entrypoint.sh cassandra -f"
+    environment:
+      - "CASSANDRA_SEEDS=seed"
+      - "CASSANDRA_CLUSTER_NAME=cluster"
+      - "CASSANDRA_DC=se1"
+      - "CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch"
+    depends_on:
+      - seed
+    networks:
+      cluster_net:
+        ipv4_address: 192.19.0.1
+
+  node2:
+    image: cassandra:latest
+    command: /bin/bash -c "echo 'Waiting for seed node' && sleep 80 && /docker-entrypoint.sh cassandra -f"
+    environment:
+      - "CASSANDRA_SEEDS=seed"
+      - "CASSANDRA_CLUSTER_NAME=cluster"
+      - "CASSANDRA_DC=se1"
+      - "CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch"
+    depends_on:
+      - seed
+    networks:
+      cluster_net:
+        ipv4_address: 192.19.0.2
+
+  java-crud:
+    command: /bin/bash -c "sleep 18000"
+    build:
+      context: ../
+      dockerfile: ./docker/Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - "seed"
+      - "node1"
+      - "node2"
+    environment:
+      - "REPLICATION_FACTOR=3"
+    networks:
+      cluster_net:
+        ipv4_address: 192.19.0.11
+
+networks:
+  cluster_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.19.0.0/24
+          gateway: 192.19.0.101

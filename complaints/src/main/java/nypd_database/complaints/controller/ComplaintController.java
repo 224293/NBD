@@ -1,26 +1,24 @@
 package nypd_database.complaints.controller;
-//
-//public class ComplaintController {
-//}
 
-import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
-
-import com.datastax.driver.core.LocalDate;
 import nypd_database.complaints.model.Complaint;
 import nypd_database.complaints.repository.ComplaintRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import static java.lang.Math.abs;
 
 @CrossOrigin(origins = "http://127.0.0.1:8081")
 @RestController
@@ -36,7 +34,7 @@ public class ComplaintController {
             Random random = new Random(System.currentTimeMillis());
             Complaint _complaint = complaintRepository.save(
                     new Complaint(
-                            random.nextInt(),
+                            abs(random.nextInt()),
                             complaint.getComplaintFromDate(),
                             complaint.getComplaintFromTime(),
                             complaint.getComplaintToDate(),
@@ -80,12 +78,12 @@ public class ComplaintController {
     }
 
     @GetMapping("/complaints")
-    public ResponseEntity<List<Complaint>> getAllComplaints(@RequestParam(required = false) String boroughName) {
+    public ResponseEntity<List<Complaint>> getAllComplaints() {
         try {
             List<Complaint> complaints = new ArrayList<Complaint>();
-            if (boroughName == null) {
-                complaintRepository.findAll().forEach(complaints::add);
-            }
+
+            complaintRepository.findAll().forEach(complaints::add);
+            
             if (complaints.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
